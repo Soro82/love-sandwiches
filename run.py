@@ -69,7 +69,7 @@ def calculate_surplus_data(sales_row):
     - Positive surplus equals waste.
     - Negative surplus equals extra stock made when stock was sold out.
     """  
-    pprint("Calculating Surplus Data ...\n")
+    print("Calculating Surplus Data ...\n")
     stock = SHEET.worksheet('stock').get_all_values()
     stock_row = stock[-1]
     
