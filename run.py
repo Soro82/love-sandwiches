@@ -13,6 +13,7 @@ SCOPED_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
 SHEET = GSPREAD_CLIENT.open('love_sandwiches')
 
+
 def get_sales_data():
     """
     Get Sales figures input from the user
@@ -25,13 +26,12 @@ def get_sales_data():
         data_str = input("Enter your data here:\n")
         sales_data = data_str.split(",")
 
-        
-
         if validate_data(sales_data):
             print("Data is valid!")
             break
 
     return sales_data
+
 
 def validate_data(values):
     """
@@ -48,8 +48,9 @@ def validate_data(values):
     except ValueError as e:
         print(f"Invalid data {e}, please try again.\n")
         return False
-    
+
     return True
+
 
 def update_worksheet(data, worksheet):
     """
@@ -68,32 +69,34 @@ def calculate_surplus_data(sales_row):
 
     - Positive surplus equals waste.
     - Negative surplus equals extra stock made when stock was sold out.
-    """  
+    """
     print("Calculating Surplus Data ...\n")
     stock = SHEET.worksheet('stock').get_all_values()
     stock_row = stock[-1]
-    
-    surplus_data = [] 
+
+    surplus_data = []
     for stock, sales in zip(stock_row, sales_row):
         surplus = int(stock) - sales
         surplus_data.append(surplus)
-    
+
     return surplus_data
+
 
 def get_last_5_entries_sales():
     """
     Collects columns of data from sales worksheet,
-    collecting the last 5 entries for each sandwich and 
+    collecting the last 5 entries for each sandwich and
     returns a list of lists.
     """
     sales = SHEET.worksheet("sales")
 
     columns = []
-    for ind in range(1,7):
+    for ind in range(1, 7):
         column = sales.col_values(ind)
         columns.append(column[-5:])
 
     return columns
+
 
 def calculate_stock_data(data):
     """
@@ -107,8 +110,9 @@ def calculate_stock_data(data):
         average = sum(int_column) / len(int_column)
         stock_num = average * 1.1
         new_stock_dat.append(round(stock_num))
-    
+
     return new_stock_dat
+
 
 def main():
     """
@@ -124,22 +128,24 @@ def main():
     update_worksheet(stock_data, "stock")
     return stock_data
 
+
 print("Welcome to Love Sandwiches data automation.\n")
 stock_data = main()
 
 
 def get_stock_values(data):
     """
-    Builds a dictionary, where the keys are the sandwich headings 
-    pulled from the spreadsheet, and the values are the calculated 
+    Builds a dictionary, where the keys are the sandwich headings
+    pulled from the spreadsheet, and the values are the calculated
     stock data.
     """
     headings = SHEET.worksheet('stock').row_values(1)
     stock_dict = {}
-    for heading, stock in  zip(headings, data):
+    for heading, stock in zip(headings, data):
         stock_dict[heading] = stock
-    
+
     return stock_dict
+
 
 stock_values = get_stock_values(stock_data)
 print(stock_values)
